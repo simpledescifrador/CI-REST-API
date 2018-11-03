@@ -13,9 +13,9 @@ class User extends CI_Model {
     /*
      * Fetch user data
      */
-    function getRows($id = null){
-        if($id != null){
-            $query = $this->db->get_where('users', array('id' => $id));
+    function getRows($data = array()){
+        if($data != null){
+            $query = $this->db->get_where('users', $data);
             return $query->row_array();
         }else{
             $query = $this->db->get('users');

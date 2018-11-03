@@ -15,11 +15,18 @@ class Access extends REST_Controller {
         
     }
     
-    public function user_get($id = 0) {
-        //returns all rows if the id parameter doesn't exist,
-        //otherwise single row will be returned
-        $users = $this->user->getRows($id);
-        
+    public function user_get() {
+        $id = $this->get('id');
+        $username = $this->get('username');
+
+        if (isset($username)) {
+            // Get User by username
+            $users = $this->user->getRows(array('username' => $username));
+        }
+        if (isset($id)) {
+            // Get user by id
+            $users = $this->user->getRows(array('id' => $id));
+        }
         //check if the user data exists
         if(!empty($users)){
             //set the response and exit
@@ -29,6 +36,22 @@ class Access extends REST_Controller {
             $this->response([
                 'status' => FALSE,
                 'message' => 'No user were found.'
+            ], REST_Controller::HTTP_NOT_FOUND);
+        }
+
+    }
+
+    public function users_get() {
+        $users = $this->user->getRows();
+        //check if the user data exists
+        if(!empty($users)){
+            //set the response and exit
+            $this->response($users, REST_Controller::HTTP_OK);
+        }else{
+            //set the response and exit
+            $this->response([
+                'status' => FALSE,
+                'message' => 'No users were found.'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
