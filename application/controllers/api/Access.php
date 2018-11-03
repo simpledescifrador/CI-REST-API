@@ -55,7 +55,7 @@ class Access extends REST_Controller {
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
-    
+
     public function user_post() {
         $userData = array();
         $userData['name'] = $this->post('name');
@@ -63,21 +63,32 @@ class Access extends REST_Controller {
         $userData['password'] = $this->encrypt_pass($this->post('password'));
         $userData['email'] = $this->post('email');
         $userData['phone'] = $this->post('phone');
+
         if(!empty($userData['name']) && !empty($userData['username']) && ($userData['password']) &&!empty($userData['email']) && !empty($userData['phone'])){
-            //insert user data
-            $insert = $this->user->insert($userData);
-            
-            //check if the user data inserted
-            if($insert){
-                //set the response and exit
+
+            // Check if user exist
+            if (!$this->user->getRows(array('username' => $userData['username']))) {
+                //insert user data
+                $insert = $this->user->insert($userData);
+                //check if the user data inserted
+                if($insert){
+                    //set the response and exit
+                    $this->response([
+                        'status' => TRUE,
+                        'message' => 'User has been added successfully.'
+                    ], REST_Controller::HTTP_OK);
+                }else{
+                    //set the response and exit
+                    $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
+                }
+            } else {
                 $this->response([
-                    'status' => TRUE,
-                    'message' => 'User has been added successfully.'
-                ], REST_Controller::HTTP_OK);
-            }else{
-                //set the response and exit
-                $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
+                    'status' => false,
+                    'message' => 'User is already exist.'
+                ], REST_Controller::HTTP_CONFLICT);
             }
+
+            
         }else{
             //set the response and exit
             $this->response("Provide complete user information to create.", REST_Controller::HTTP_BAD_REQUEST);
