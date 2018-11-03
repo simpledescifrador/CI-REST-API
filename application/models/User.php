@@ -63,6 +63,18 @@ class User extends CI_Model {
         $delete = $this->db->delete('users',array('id'=>$id));
         return $delete?true:false;
     }
+    
+    public function getPasswordHash($username){
+        if ($username != null) {
+            $this->db->where('username', $username);
+            $this->db->from('users');
+            $query = $this->db->get();
 
-}
+            foreach ($query->result() as $row){
+                return $row->password;
+            }
+
+        }
+    }
+}  
 ?>
