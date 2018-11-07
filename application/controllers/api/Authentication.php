@@ -41,8 +41,7 @@ class Authentication extends REST_Controller {
                 ], REST_Controller::HTTP_OK);
             }else{
                 // Set the response and exit
-                //BAD_REQUEST (400) being the HTTP response code
-                $this->response("Wrong email or password.", REST_Controller::HTTP_BAD_REQUEST);
+                $this->response("Wrong email or password.", REST_Controller::HTTP_NOT_FOUND);
             }
         }else{
             // Set the response and exit
