@@ -15,30 +15,25 @@ class Access extends REST_Controller {
         
     }
     
-    public function user_get() {
-        $id = $this->get('id');
-        $username = $this->get('username');
-
-        if (isset($username)) {
-            // Get User by username
-            $users = $this->user->getRows(array('username' => $username));
-        }
-        if (isset($id)) {
-            // Get user by id
-            $users = $this->user->getRows(array('id' => $id));
-        }
-        //check if the user data exists
+    public function user_get($id = 0) {
+        // Returns all the users data if the id not specified,
+        // Otherwise, a single user will be returned.
+        $con = $id?array('id' => $id):'';
+        $users = $this->user->getRows($con);
+        
+        // Check if the user data exists
         if(!empty($users)){
-            //set the response and exit
+            // Set the response and exit
+            //OK (200) being the HTTP response code
             $this->response($users, REST_Controller::HTTP_OK);
         }else{
-            //set the response and exit
+            // Set the response and exit
+            //NOT_FOUND (404) being the HTTP response code
             $this->response([
                 'status' => FALSE,
-                'message' => 'No user were found.'
+                'message' => 'No user was found.'
             ], REST_Controller::HTTP_NOT_FOUND);
         }
-
     }
 
     public function users_get() {
@@ -56,89 +51,78 @@ class Access extends REST_Controller {
         }
     }
 
-    public function user_post() {
-        $userData = array();
-        $userData['name'] = $this->post('name');
-        $userData['username'] = $this->post('username');
-        $userData['password'] = $this->encrypt_pass($this->post('password'));
-        $userData['email'] = $this->post('email');
-        $userData['phone'] = $this->post('phone');
+    public function user_put($id) {
+        
+        // Get the post data
+        $name = strip_tags($this->put('name'));
+        $email = strip_tags($this->put('email'));
+        $password = $this->put('password');
+        $phone = strip_tags($this->put('phone'));
+        echo $id;
+        // Validate the post data
+        if(!empty($id) && (!empty($name) || !empty($email) || !empty($password) || !empty($phone))){
+            // Update user's account data
+            $userData = array();
+            if(!empty($name)){
+                $userData['name'] = $name;
+            }
+            if(!empty($email)){
+                $userData['email'] = $email;
+            }
+            if(!empty($password)){
+                $userData['password'] = md5($password);
+            }
+            if(!empty($phone)){
+                $userData['phone'] = $phone;
+            }
+            $update = $this->user->update($userData, $id);
+            
+            // Check if the user data is updated
+            if($update){
+                // Set the response and exit
+                $this->response([
+                    'status' => TRUE,
+                    'message' => 'The user info has been updated successfully.'
+                ], REST_Controller::HTTP_OK);
+            }else{
+                // Set the response and exit
+                $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
+            }
+        }else{
+            // Set the response and exit
+            $this->response("Provide at least one user info to update.", REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+    
+    public function user_delete($id){
 
-        if(!empty($userData['name']) && !empty($userData['username']) && ($userData['password']) &&!empty($userData['email']) && !empty($userData['phone'])){
-
-            // Check if user exist
-            if (!$this->user->getRows(array('username' => $userData['username']))) {
-                //insert user data
-                $insert = $this->user->insert($userData);
-                //check if the user data inserted
-                if($insert){
+        //check whether post id is not empty
+        if($id){
+            
+            if ($this->user->getRows(array('id' => $id))) {
+                //delete post
+                $delete = $this->user->delete($id);
+                
+                if($delete){
                     //set the response and exit
                     $this->response([
                         'status' => TRUE,
-                        'message' => 'User has been added successfully.'
+                        'message' => 'User has been removed successfully.'
                     ], REST_Controller::HTTP_OK);
                 }else{
                     //set the response and exit
                     $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
                 }
             } else {
+                //set the response and exit
                 $this->response([
-                    'status' => false,
-                    'message' => 'User is already exist.'
-                ], REST_Controller::HTTP_CONFLICT);
+                    'status' => FALSE,
+                    'message' => 'User does not exist.'
+                ], REST_Controller::HTTP_NOT_FOUND);
             }
 
-            
-        }else{
-            //set the response and exit
-            $this->response("Provide complete user information to create.", REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-    
-    public function user_put($id) {
-        $userData = array();
-        $userData['name'] = $this->put('name');
-        $userData['username'] = $this->put('username');
-        $userData['password'] = $this->encrypt_pass($this->post('password'));
-        $userData['email'] = $this->put('email');
-        $userData['phone'] = $this->put('phone');
-        if(!empty($id) && !empty($userData['name']) && !empty($userData['username']) && ($userData['password']) &&!empty($userData['email']) && !empty($userData['phone'])){
-            //update user data
-            $update = $this->user->update($userData, $id);
-            
-            //check if the user data updated
-            if($update){
-                //set the response and exit
-                $this->response([
-                    'status' => TRUE,
-                    'message' => 'User has been updated successfully.'
-                ], REST_Controller::HTTP_OK);
-            }else{
-                //set the response and exit
-                $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
-            }
-        }else{
-            //set the response and exit
-            $this->response("Provide complete user information to update.", REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-    
-    public function user_delete($id){
-        //check whether post id is not empty
-        if($id){
-            //delete post
-            $delete = $this->user->delete($id);
-            
-            if($delete){
-                //set the response and exit
-                $this->response([
-                    'status' => TRUE,
-                    'message' => 'User has been removed successfully.'
-                ], REST_Controller::HTTP_OK);
-            }else{
-                //set the response and exit
-                $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
-            }
+
+
         }else{
             //set the response and exit
             $this->response([
@@ -147,12 +131,4 @@ class Access extends REST_Controller {
             ], REST_Controller::HTTP_NOT_FOUND);
         }
     }
-
-    private function encrypt_pass($pass)
-    {
-        return password_hash($pass, PASSWORD_DEFAULT);
-    }
-
 }
-
-?>
