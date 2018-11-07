@@ -22,7 +22,7 @@ class Authentication extends REST_Controller {
         
         // Validate the post data
         if(!empty($email) && !empty($password)){
-            
+        
             // Check if any user exists with the given credentials
             $con['returnType'] = 'single';
             $con['conditions'] = array(
@@ -41,7 +41,8 @@ class Authentication extends REST_Controller {
                 ], REST_Controller::HTTP_OK);
             }else{
                 // Set the response and exit
-                $this->response("Wrong email or password.", REST_Controller::HTTP_NOT_FOUND);
+                //BAD_REQUEST (400) being the HTTP response code
+                $this->response("Wrong email or password.", REST_Controller::HTTP_BAD_REQUEST);
             }
         }else{
             // Set the response and exit
