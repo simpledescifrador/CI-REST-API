@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title><?php echo $title; ?></title>
-</head>
-<body>
-  <h1>Admin Dashboard</h1>
-</body>
-</html>
+
+<br />
+<br />
+<div align="center">
+  <img src="assets\image\icon.png" alt="app icon" width="50px" height="50px">
+  <h2>Welcome to Makahanap Web ADMIN</h2>
+</div>
+<div align="center">
+  <h6><em>System is under development</em></h6>
+  <img src="assets\image\loading-sample.gif" alt="Loading System Under Development" width="400px" height="400px">
+  <p>Loading . . .</p>
+</div>
