@@ -33,6 +33,7 @@ class Authentication extends REST_Controller {
             $user = $this->user->getRows($con);
             
             if($user){
+                
                 // Set the response and exit
                 $this->response([
                     'status' => TRUE,
@@ -52,10 +53,9 @@ class Authentication extends REST_Controller {
     
     public function registration_post() {
         // Get the post data
-        $name = strip_tags($this->post('name'));
+        $username = strip_tags($this->post('username'));
         $email = strip_tags($this->post('email'));
         $password = $this->post('password');
-        $phone = strip_tags($this->post('phone'));
         
         // Validate the post data
         if(!empty($name) && !empty($email) && !empty($password)){
@@ -73,10 +73,9 @@ class Authentication extends REST_Controller {
             }else{
                 // Insert user data
                 $userData = array(
-                    'name' => $name,
+                    'username' => $name,
                     'email' => $email,
-                    'password' => md5($password),
-                    'phone' => $phone
+                    'password' => md5($password)
                 );
                 $insert = $this->user->insert($userData);
                 
