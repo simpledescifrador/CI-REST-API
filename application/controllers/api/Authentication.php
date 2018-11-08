@@ -58,7 +58,7 @@ class Authentication extends REST_Controller {
         $password = $this->post('password');
         
         // Validate the post data
-        if(!empty($name) && !empty($email) && !empty($password)){
+        if(!empty($username) && !empty($email) && !empty($password)){
             
             // Check if the given email already exists
             $con['returnType'] = 'count';
