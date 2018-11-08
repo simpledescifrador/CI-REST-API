@@ -69,7 +69,7 @@ class Authentication extends REST_Controller {
             
             if($userCount > 0){
                 // Set the response and exit
-                $this->response("The given email already exists.", REST_Controller::HTTP_BAD_REQUEST);
+                $this->response("The given email already exists.", REST_Controller::HTTP_CONFLICT);
             }else{
                 // Insert user data
                 $userData = array(
