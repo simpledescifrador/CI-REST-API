@@ -73,7 +73,7 @@ class Authentication extends REST_Controller {
             }else{
                 // Insert user data
                 $userData = array(
-                    'username' => $name,
+                    'username' => $username,
                     'email' => $email,
                     'password' => md5($password)
                 );
