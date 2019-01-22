@@ -1,62 +1,25 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-/*
-| -------------------------------------------------------------------------
-| URI ROUTING
-| -------------------------------------------------------------------------
-| This file lets you re-map URI requests to specific controller functions.
-|
-| Typically there is a one-to-one relationship between a URL string
-| and its corresponding controller class/method. The segments in a
-| URL normally follow this pattern:
-|
-|	example.com/class/method/id/
-|
-| In some instances, however, you may want to remap this relationship
-| so that a different class/function is called than the one
-| corresponding to the URL.
-|
-| Please see the user guide for complete details:
-|
-|	https://codeigniter.com/user_guide/general/routing.html
-|
-| -------------------------------------------------------------------------
-| RESERVED ROUTES
-| -------------------------------------------------------------------------
-|
-| There are three reserved routes:
-|
-|	$route['default_controller'] = 'welcome';
-|
-| This route indicates which controller class should be loaded if the
-| URI contains no data. In the above example, the "welcome" class
-| would be loaded.
-|
-|	$route['404_override'] = 'errors/page_missing';
-|
-| This route will tell the Router which controller/method to use if those
-| provided in the URL cannot be matched to a valid route.
-|
-|	$route['translate_uri_dashes'] = FALSE;
-|
-| This is not exactly a route, but allows you to automatically route
-| controller and method names that contain dashes. '-' isn't a valid
-| class or method name character, so it requires translation.
-| When you set this option to TRUE, it will replace ALL dashes in the
-| controller and method URI segments.
-|
-| Examples:	my-controller/index	-> my_controller/index
-|		my-controller/my-method	-> my_controller/my_method
-*/
-
 $route['default_controller'] = 'admin';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
-$route['api/auth/login']['post'] = 'api/authentication/login';
-$route['api/auth/registration']['post'] = 'api/authentication/registration';
-$route['api/show/user/(:num)']['get'] = 'api/access/user/$1';
-$route['api/update/user/(:num)']['put'] = 'api/access/user/$1';
-$route['api/delete/user/(:num)']['delete'] = 'api/access/user/$1';
-$route['api/show/user/all']['get'] = 'api/access/users';
+//Login & Registration Routes
+$route['api/register']['post'] = 'api/auth/registration';
+$route['api/login']['post'] = 'api/auth/login';
+//Report Routes
+$route['api/report/lost']['post'] = 'api/report/lost';
+$route['api/report/found']['post'] = 'api/report/found';
+//Item Routes
+$route['api/lost/update/(:num)']['put'] = 'api/itemController/updateLost/$1';
+$route['api/found/update/(:num)']['put'] = 'api/itemController/updateFound/$1';
+$route['api/item/lost']['get'] = 'api/itemController/lost';
+$route['api/item/found']['get'] = 'api/itemController/found';
+$route['api/item/feed']['get'] = 'api/itemController/feed';
+$route['api/item/total']['get'] = 'api/itemController/total';
+$route['api/item/delete/(:num)']['delete'] = 'api/itemController/deleteItem/$1';
 
+//Account Routes
+$route['api/account/search']['get'] = 'api/accountController/searchAccount';
+$route['api/account/update/(:num)']['put'] = 'api/accountController/updateAccountById/$1';
+$route['api/account/delete/(:num)']['delete'] = 'api/accountController/deleteAccountById/$1';

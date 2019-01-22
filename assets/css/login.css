@@ -1,0 +1,29 @@
+@charset "utf-8";
+
+@media (max-width: 918px){
+}
+
+.login-container{
+	width: 40rem;
+	margin:auto;
+	height: auto;
+}
+.login-spacer{
+	padding-top: 6em;
+}
+.section-image {
+	background: url(../images/../images/Makati-City-Skyline.jpg);
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	padding: 3rem;
+}
+.section-login {
+	background: rgba(55,90,127,0.50);
+	padding: 1em;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+}
+.title{
+	font-size: 2em;
+	text-align: center;
+}

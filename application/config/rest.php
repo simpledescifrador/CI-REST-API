@@ -153,7 +153,7 @@ $config['strict_api_and_auth'] = TRUE; // force the use of both api and auth bef
 | For digest authentication the library function should return already a stored
 | md5(username:restrealm:password) for that username
 |
-| e.g: md5('admin:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
+| e.g: md5('web:REST API:1234') = '1e957ebc35631ab22d5bd6526bd14ea2'
 |
 */
 $config['auth_library_class'] = '';
