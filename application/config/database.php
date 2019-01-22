@@ -75,10 +75,10 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '',
-	'database' => 'makahanap',
+	'hostname' => 'a1eiouafq2fmzuyh.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+	'username' => 'wxn5uk588b1bwkmp',
+	'password' => 'fe4kdampnngdf66d ',
+	'database' => 'primary_app_db',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
