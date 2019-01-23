@@ -23,3 +23,6 @@ $route['api/item/delete/(:num)']['delete'] = 'api/itemController/deleteItem/$1';
 $route['api/account/search']['get'] = 'api/accountController/searchAccount';
 $route['api/account/update/(:num)']['put'] = 'api/accountController/updateAccountById/$1';
 $route['api/account/delete/(:num)']['delete'] = 'api/accountController/deleteAccountById/$1';
+
+//Barangay Routes
+$route['api/barangay']['get'] = 'api/barangayController';

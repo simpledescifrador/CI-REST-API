@@ -75,12 +75,12 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'a1eiouafq2fmzuyh.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
-	'username' => 'wxn5uk588b1bwkmp',
-	'password' => 'fe4kdampnngdf66d ',
+	'hostname' => 'localhost',
+	'username' => 'root',
+	'password' => '',
 	'database' => 'makahanap',
 	'dbdriver' => 'mysqli',
-	'dbprefix' => 'primary_app_db',
+	'dbprefix' => '',
 	'pconnect' => FALSE,
 	'db_debug' => (ENVIRONMENT !== 'production'),
 	'cache_on' => FALSE,
