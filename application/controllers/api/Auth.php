@@ -23,7 +23,7 @@ class Auth extends REST_Controller
     {
         //Get Post Data
         $card_number = $this->post('card_number');
-        $username = strip_tags($this->post('username'));
+//        $username = strip_tags($this->post('username'));
         $password = $this->post('password');
         $name = $this->post('name');
         $age = $this->post('age');
@@ -32,8 +32,7 @@ class Auth extends REST_Controller
         $civil_status = $this->post('civil_status');
 
         //Validate Post Data
-        if (!empty($card_number) && !empty($username) && !empty($password) &&
-            !empty($name) && !empty($age) && !empty($address) && !empty($contact_number) && !empty($civil_status)) {
+        if (isset($card_number, $password, $name, $age, $address, $contact_number, $civil_status)) {
             // Check if the given card_number already exists
             $con['returnType'] = 'count';
             $con['conditions'] = array(
@@ -50,7 +49,6 @@ class Auth extends REST_Controller
                 // Insert Account Data
                 $account_data = array(
                     'card_number' => $card_number,
-                    'username' => $username,
                     'password' => md5($password),
                     'name' => $name,
                     'age' => $age,
@@ -63,7 +61,7 @@ class Auth extends REST_Controller
 
                 $con['returnType'] = 'single';
                 $con['conditions'] = array(
-                    'username' => $username,
+                    'card_number' => $card_number,
                     'password' => md5($password)
                 );
 
@@ -92,16 +90,17 @@ class Auth extends REST_Controller
     public function login_post()
     {
         //Get username and password
-        $username = $this->post('username');
+//        $username = $this->post('username');
+        $card_number = $this->post('card_number');
         $password = $this->post('password');
 
         //Validate data
-        if (!empty($username) && !empty($password)) {
+        if (isset($card_number, $password)) {
             //do login verification here
             // Check if any user exists with the given credentials
             $con['returnType'] = 'single';
             $con['conditions'] = array(
-                'username' => $username,
+                'card_number' => $card_number,
                 'password' => md5($password)
             );
 
@@ -125,13 +124,13 @@ class Auth extends REST_Controller
                 // Set the response and exit
                 //Not found (404) being the HTTP response code
                 $this->response(array(
-                    'message' => 'Wrong email or password'
+                    'message' => 'Wrong card number or password'
                 ), REST_Controller::HTTP_NOT_FOUND);
             }
 
         } else {
             // Set the response and exit
-            $this->response("Provide email and password.", REST_Controller::HTTP_BAD_REQUEST);
+            $this->response("Provide card_number and password.", REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 }
