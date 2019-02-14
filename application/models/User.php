@@ -97,5 +97,24 @@ class User extends CI_Model {
         //return the status
         return $delete?true:false;
     }
+    
+    
+    /***** getting the type of user */
+    public function user_type($data = array())
+    {
+        $condition = "username =" . "'" . $data['username'] ."'";
+			$this->db->select('type');
+			$this->db->from($this->user);
+			$this->db->where($condition);
+			$this->db->limit(1);
+			$query = $this->db->get();
+			if ($query->num_rows() == 1) 
+			{
+				return $query->result();
+			} else 
+				{
+					return FALSE;
+		}
+    }
 
 }

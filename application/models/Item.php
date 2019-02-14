@@ -4,12 +4,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Item extends CI_Model
 {
     private $table_name;
+    private $time_zone;
 
     public function __construct()
     {
         parent::__construct();
         $this->table_name = "item";
         $this->load->helper('date');
+        $this->time_zone = 'Asia/Manila';
     }
 
     public function get($params = null)
@@ -56,8 +58,8 @@ class Item extends CI_Model
 
     public function insert($data)
     {
-//        $format = 'DATE_RFC822';
-//        $data['published_at'] = date($format, time());
+        $data['published_at'] = unix_to_human(now($this->time_zone), TRUE);
+        $data['date_modified'] = unix_to_human(now($this->time_zone), TRUE);
         $insert = $this->db->insert($this->table_name, $data);
 
         //return the status
@@ -66,7 +68,7 @@ class Item extends CI_Model
 
     public function update($data, $id)
     {
-        //update user data in users table
+        $data['date_modified'] = unix_to_human(now($this->time_zone), TRUE);
         $update = $this->db->update($this->table_name, $data, array('id' => $id));
 
         //return the status
@@ -77,9 +79,17 @@ class Item extends CI_Model
     {
         $delete = $this->db->delete($this->table_name, array('id' => $id));
         //return the status
-        return $delete? true : false;
+        return $delete ? true : false;
     }
 
+    public function update_status($id, $new_status)
+    {
+        $data = array('status' => $new_status, 'date_modified' => unix_to_human(now($this->time_zone), TRUE)); //set new value
+        $this->db->where('id', $id); //set condition
+        $update_result = $this->db->update($this->table_name, $data); //update table
+
+        return $update_result ? true : false;
+    }
 }
 
 /* End of file .php */

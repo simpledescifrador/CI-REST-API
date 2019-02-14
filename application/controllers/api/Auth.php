@@ -19,118 +19,109 @@ class Auth extends REST_Controller
         $this->load->model('account');
     }
 
-    public function registration_post()
+    public function register_post()
     {
-        //Get Post Data
-        $card_number = $this->post('card_number');
-//        $username = strip_tags($this->post('username'));
-        $password = $this->post('password');
-        $name = $this->post('name');
-        $age = $this->post('age');
-        $address = $this->post('address');
-        $contact_number = $this->post('contact_number');
-        $civil_status = $this->post('civil_status');
-
-        //Validate Post Data
-        if (isset($card_number, $password, $name, $age, $address, $contact_number, $civil_status)) {
-            // Check if the given card_number already exists
-            $con['returnType'] = 'count';
-            $con['conditions'] = array(
-                'card_number' => $card_number,
-            );
-
-            $account_count = $this->account->get($con);
-
-            if ($account_count > 0) {
-                // Set the response and exit
-                $this->response("The given card number already exists", REST_Controller::HTTP_CONFLICT);
-            } else {
-
-                // Insert Account Data
-                $account_data = array(
-                    'card_number' => $card_number,
-                    'password' => md5($password),
-                    'name' => $name,
-                    'age' => $age,
-                    'address' => $address,
-                    'contact_number' => $contact_number,
-                    'civil_status' => $civil_status
-                );
-
-                $account_insert_id = $this->account->insert($account_data);
-
-                $con['returnType'] = 'single';
-                $con['conditions'] = array(
-                    'card_number' => $card_number,
-                    'password' => md5($password)
-                );
-
-                $account = $this->account->get($con);
-
-                if ($account_insert_id) {
-                    // Set the response and exit
-                    $this->response(array(
-                        'status' => TRUE,
-                        'message' => 'The account has been added successfully.',
-                        'account_data' => $account
-                    ), REST_Controller::HTTP_CREATED);
-                } else {
-                    // Set the response and exit
-                    $this->response("Some problems occurred, please try again.", REST_Controller::HTTP_BAD_REQUEST);
-                }
+        //$new_account['id'] = uniqid('A');
+        $new_account['card_number'] = $this->post('card_number');
+        $new_account['password'] = md5($this->post('password'));
+        $new_account['first_name'] = $this->post('first_name');
+        $new_account['middle_name'] = $this->post('middle_name');
+        $new_account['last_name'] = $this->post('last_name');
+        $new_account['age'] = $this->post('age');
+        $new_account['sex'] = $this->post('sex');
+        $new_account['address'] = $this->post('address');
+        $new_account['contact_number'] = $this->post('contact_number');
+        $new_account['civil_status'] = $this->post('civil_status');
+        $new_account['image'] = $this->post('image_url');
+        $new_account['status'] = 1; //new account
+        $valid_account = false;
+//       Validate new account
+        foreach ($new_account as $account_data) {
+            if (isset($account_data)) {
+                $valid_account = true;
             }
-
-        } else {
-            // Set the response and exit
-            $this->response("Provide account details", REST_Controller::HTTP_BAD_REQUEST);
         }
 
+        if ($valid_account) {
+            $account_exist = $this->account->get(array('returnType' => 'count', 'conditions' => array('card_number' => $new_account['card_number'])));
+            if (!$account_exist) {
+                $account_id = $this->account->insert($new_account); //Insert new account
+                $account_data = $this->account->get(array('id' => $account_id)); //get account data
+                if ($account_data) {
+                    $this->response(array(
+                        'status' => true,
+                        'message' => 'Registration Success',
+                        'account_data' => array(
+							'id' => $account_data['id'],
+                            'card_number' => $account_data['card_number'],
+                            'first_name' => $account_data['first_name'],
+                            'middle_name' => $account_data['middle_name'],
+                            'last_name' => $account_data['last_name'],
+                            'age' => (int)$account_data['age'],
+                            'address' => $account_data['address'],
+                            'sex' => $account_data['sex'],
+                            'civil_status' => $account_data['civil_status'],
+                            'contact_number' => $account_data['contact_number'],
+                            'image_url' => $account_data['image'],
+                            'date_created' => $account_data['date_created'],
+                            'status' => $account_data['status']
+                        )
+                    ), REST_Controller::HTTP_OK);
+                } else {
+                    $this->response(array(
+                        'status' => false,
+                        'message' => 'Registration failed'
+                    ), REST_Controller::HTTP_OK);
+                }
+            } else {
+                $this->response(array(
+                    'status' => false,
+                    'message' => 'Card number is already used'
+                ), REST_Controller::HTTP_OK);
+            }
+        } else {
+            $this->response("Invalid account", REST_Controller::HTTP_BAD_REQUEST);
+        }
     }
 
     public function login_post()
     {
-        //Get username and password
-//        $username = $this->post('username');
-        $card_number = $this->post('card_number');
-        $password = $this->post('password');
+        $credentials['card_number'] = $this->post('card_number');
+        $credentials['password'] = md5($this->post('password'));
 
-        //Validate data
-        if (isset($card_number, $password)) {
-            //do login verification here
-            // Check if any user exists with the given credentials
-            $con['returnType'] = 'single';
-            $con['conditions'] = array(
-                'card_number' => $card_number,
-                'password' => md5($password)
-            );
+        if (isset($credentials['card_number'], $credentials['password'])) {
 
-            $account_data = $this->account->get($con);
-            if ($account_data) {
-                if ($account_data['status'] != 'Banned') {
-                    //set response and exit 
-                    $this->response(array(
-                        'status' => TRUE,
-                        'message' => 'Account Verified',
-                        'account_data' => $account_data
-                    ), REST_Controller::HTTP_ACCEPTED);
-                } else {
-                    //inform account is banned from the system
-                    //set response
-                    $this->response(array(
-                        'message' => 'Account is banned'
-                    ), REST_Controller::HTTP_UNAUTHORIZED);
-                }
-            } else {
-                // Set the response and exit
-                //Not found (404) being the HTTP response code
+            $result = $this->account->get(array(
+                'returnType' => 'single',
+                'conditions' => $credentials));
+            if ($result) {
                 $this->response(array(
-                    'message' => 'Wrong card number or password'
-                ), REST_Controller::HTTP_NOT_FOUND);
+                    'valid' => true,
+                    'message' => "Login Successful",
+                    "data" => array(
+                        'id' => $result['id'],
+                        'card_number' => $result['card_number'],
+                        'first_name' => $result['first_name'],
+                        'middle_name' => $result['middle_name'],
+                        'last_name' => $result['last_name'],
+                        'age' => (int) $result['age'],
+                        'address' => $result['address'],
+                        'sex' => $result['sex'],
+                        'civil_status' => $result['civil_status'],
+                        'contact_number' => $result['contact_number'],
+                        'image_url' => $result['image'],
+                        'date_created' => $result['date_created'],
+                        'status' => $result['status']
+                    )
+                ), REST_Controller::HTTP_OK);
+            } else {
+                $this->response(array(
+                    'valid' => false,
+                    'message' => "Invalid card number or password"
+                ), REST_Controller::HTTP_OK);
             }
-
         } else {
-            // Set the response and exit
-            $this->response("Provide card_number and password.", REST_Controller::HTTP_BAD_REQUEST);
+            $this->response("Card number and password is required", REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 }

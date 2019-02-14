@@ -22,7 +22,15 @@ class BarangayController extends REST_Controller
 
 
         if (isset($id)) {
-            //TODO retrieve barangay info by ID
+            $barangay_info = $this->barangay->get(array('id' => $id));
+				$data = array(
+					'id' => (int)$barangay_info['id'],
+                    'name' => ucwords(strtolower($barangay_info['name'])),
+                    'address' => $barangay_info['address'],
+                    'district_no' => (int)$barangay_info['district_no'],
+                    'latitude' => $barangay_info['latitude'],
+                    'longitude' => $barangay_info['longitude']
+				);
         } else {
             $barangay_info = $this->barangay->get();
             $barangay_size = $this->barangay->get(array('returnType' => 'count'));

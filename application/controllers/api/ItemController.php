@@ -20,6 +20,9 @@ class ItemController extends REST_Controller
         $this->load->model('item_location');
         $this->load->model('item');
         $this->load->model('repository');
+        $this->load->model('barangay');
+        $this->load->model('pet_model');
+        $this->load->model('person_model');
     }
 
     public function lost_get()
@@ -29,7 +32,6 @@ class ItemController extends REST_Controller
 
         //Return Single Item if ID is provided else all items returned
         if (isset($id)) {
-            //TODO Get lost item by id
             $con['returnType'] = 'single';
             $con['id'] = $id;
 
@@ -96,7 +98,7 @@ class ItemController extends REST_Controller
 
         if (isset($limit)) {
             //Get all item with limit provided
-
+            //
         } else {
             //Get all item
             $lost_item = $this->lost_item->get();
@@ -118,7 +120,7 @@ class ItemController extends REST_Controller
         $account_id = $this->get('account_id');
         $lost_item = $this->lost_item->get();
         $found_item = $this->found_item->get();
-        $items = $this->item->get();
+        $items = $this->item->get(array('conditions' => array('status' => 'New')));
         $feed_items = array();
 
         if (isset($filter)) {
@@ -130,6 +132,7 @@ class ItemController extends REST_Controller
                         $account_data = $this->account->get(array("id" => $items[$i]['account_id']));
                         foreach ($lost_item as $lost) {
                             if ($items[$i]['item_id'] == $lost['id'] && $items[$i]['type'] == "Lost") {
+                                $location_info = $this->item_location->get(array("id" => $lost['location_id']));
                                 $feed_items[$i] = array(
                                     "id" => $items[$i]['id'],
                                     "type" => "Lost",
@@ -143,9 +146,20 @@ class ItemController extends REST_Controller
                                     "published_at" => $items[$i]['published_at'],
                                     "account" => array(
                                         "id" => $account_data['id'],
-                                        "username" => $account_data['username'],
-                                        "name" => $account_data['name']
-                                    )
+                                        "first_name" => $account_data['first_name'],
+                                        'middle_name' => $account_data['middle_name'],
+                                        'last_name' => $account_data['last_name'],
+                                        'image_url' => $account_data['image']
+                                    ),
+                                    "location_info" => array(
+                                        "id" => $location_info['id'],
+                                        "name" => $location_info['name'],
+                                        "address" => $location_info['address'],
+                                        "latitude" => $location_info['latitude'],
+                                        "longitude" => $location_info['longitude']
+                                    ),
+                                    "item_status" => $items[$i]['status']
+
 
                                 );
                                 break;
@@ -165,6 +179,7 @@ class ItemController extends REST_Controller
                                     'item_id' => $items[$i]['id']
                                 );
                                 $repo = $this->repository->get($con);
+                                $barangay = $this->barangay->get(array('id' => $repo['brgy_id']));
                                 $feed_items[$i] = array(
                                     "id" => $items[$i]['id'],
                                     "type" => "Found",
@@ -176,11 +191,21 @@ class ItemController extends REST_Controller
                                     "image_url" => 'uploads/found/' . $found['item_image'],
                                     "published_at" => $items[$i]['published_at'],
                                     "item_surrendered" => $repo['item_received'] == "Yes" ? true : false,
-                                    "brgy_id" => $repo['brgy_id'] != null ? $repo['brgy_id'] : "",
+                                    "date_surrendered" => $repo['date_item_received'],
+                                    "barangay_info" => array(
+                                        "id" => (int)$barangay['id'],
+                                        "name" => ucwords(strtolower($barangay['name'])),
+                                        "address" => $barangay['address'],
+                                        "district_no" => (int)$barangay['district_no'],
+                                        "latitude" => $barangay['latitude'],
+                                        "longitude" => $barangay['longitude']
+                                    ),
                                     "account" => array(
                                         "id" => $account_data['id'],
-                                        "username" => $account_data['username'],
-                                        "name" => $account_data['name']
+                                        "first_name" => $account_data['first_name'],
+                                        'middle_name' => $account_data['middle_name'],
+                                        'last_name' => $account_data['last_name'],
+                                        'image_url' => $account_data['image']
                                     ),
                                     "location_info" => array(
                                         "id" => $location_info['id'],
@@ -188,7 +213,8 @@ class ItemController extends REST_Controller
                                         "address" => $location_info['address'],
                                         "latitude" => $location_info['latitude'],
                                         "longitude" => $location_info['longitude']
-                                    )
+                                    ),
+                                    "item_status" => $items[$i]['status']
 
                                 );
                                 break;
@@ -208,6 +234,11 @@ class ItemController extends REST_Controller
                 $account_data = $this->account->get(array("id" => $items[$i]['account_id']));
                 foreach ($lost_item as $lost) {
                     if ($items[$i]['item_id'] == $lost['id'] && $items[$i]['type'] == "Lost") {
+                        $location_info = $this->item_location->get(array("id" => $lost['location_id']));
+                        $con['returnType'] = 'single';
+                        $con['conditions'] = array(
+                            'item_id' => $items[$i]['id']
+                        );
                         $feed_items[$i] = array(
                             "id" => $items[$i]['id'],
                             "type" => "Lost",
@@ -215,15 +246,25 @@ class ItemController extends REST_Controller
                             "description" => ucfirst(strtolower($lost['item_description'])),
                             "category" => $lost['item_category'],
                             "date" => $lost['date_lost'],
-                            "location" => $lost['location_lost'],
+                            "location" => $lost['location_id'],
                             "reward" => $lost['reward'],
                             "image_url" => 'uploads/lost/' . $lost['item_image'],
                             "published_at" => $items[$i]['published_at'],
                             "account" => array(
                                 "id" => $account_data['id'],
-                                "username" => $account_data['username'],
-                                "name" => $account_data['name']
-                            )
+                                "first_name" => $account_data['first_name'],
+                                'middle_name' => $account_data['middle_name'],
+                                'last_name' => $account_data['last_name'],
+                                'image_url' => $account_data['image']
+                            ),
+                            "location_info" => array(
+                                "id" => $location_info['id'],
+                                "name" => $location_info['name'],
+                                "address" => $location_info['address'],
+                                "latitude" => $location_info['latitude'],
+                                "longitude" => $location_info['longitude']
+                            ),
+                            "item_status" => $items[$i]['status']
 
                         );
                         break;
@@ -237,6 +278,7 @@ class ItemController extends REST_Controller
                             'item_id' => $items[$i]['id']
                         );
                         $repo = $this->repository->get($con);
+                        $barangay = $this->barangay->get(array('id' => $repo['brgy_id']));
                         $feed_items[$i] = array(
                             "id" => $items[$i]['id'],
                             "type" => "Found",
@@ -248,11 +290,21 @@ class ItemController extends REST_Controller
                             "image_url" => 'uploads/found/' . $found['item_image'],
                             "published_at" => $items[$i]['published_at'],
                             "item_surrendered" => $repo['item_received'] == "Yes" ? true : false,
-                            "brgy_id" => $repo['brgy_id'] != null ? $repo['brgy_id'] : "",
+                            "date_surrendered" => $repo['date_item_received'],
+                            "barangay_info" => array(
+                                "id" => (int)$barangay['id'],
+                                "name" => ucwords(strtolower($barangay['name'])),
+                                "address" => $barangay['address'],
+                                "district_no" => (int)$barangay['district_no'],
+                                "latitude" => $barangay['latitude'],
+                                "longitude" => $barangay['longitude']
+                            ),
                             "account" => array(
                                 "id" => $account_data['id'],
-                                "username" => $account_data['username'],
-                                "name" => $account_data['name']
+                                "first_name" => $account_data['first_name'],
+                                'middle_name' => $account_data['middle_name'],
+                                'last_name' => $account_data['last_name'],
+                                'image_url' => $account_data['image']
                             ),
                             "location_info" => array(
                                 "id" => $location_info['id'],
@@ -260,7 +312,8 @@ class ItemController extends REST_Controller
                                 "address" => $location_info['address'],
                                 "latitude" => $location_info['latitude'],
                                 "longitude" => $location_info['longitude']
-                            )
+                            ),
+                            "item_status" => $items[$i]['status']
 
                         );
                         break;
@@ -273,6 +326,8 @@ class ItemController extends REST_Controller
             for ($i = 0; $i < count($items); $i++) {
                 $account_data = $this->account->get(array("id" => $items[$i]['account_id']));
                 foreach ($lost_item as $lost) {
+                    $location_info = $this->item_location->get(array("id" => $lost['location_id']));
+
                     if ($items[$i]['item_id'] == $lost['id'] && $items[$i]['type'] == "Lost") {
                         $feed_items[$i] = array(
                             "id" => $items[$i]['id'],
@@ -281,15 +336,25 @@ class ItemController extends REST_Controller
                             "description" => ucfirst(strtolower($lost['item_description'])),
                             "category" => $lost['item_category'],
                             "date" => $lost['date_lost'],
-                            "location" => $lost['location_lost'],
-                            "reward" => $lost['reward'],
+                            "brand" => $lost['brand'],
+                            "reward" => (double)$lost['reward'],
                             "image_url" => 'uploads/lost/' . $lost['item_image'],
                             "published_at" => $items[$i]['published_at'],
                             "account" => array(
                                 "id" => $account_data['id'],
-                                "username" => $account_data['username'],
-                                "name" => $account_data['name']
-                            )
+                                "first_name" => $account_data['first_name'],
+                                'middle_name' => $account_data['middle_name'],
+                                'last_name' => $account_data['last_name'],
+                                'image_url' => $account_data['image']
+                            ),
+                            "location_info" => array(
+                                "id" => $location_info['id'],
+                                "name" => $location_info['name'],
+                                "address" => $location_info['address'],
+                                "latitude" => $location_info['latitude'],
+                                "longitude" => $location_info['longitude']
+                            ),
+                            "item_status" => $items[$i]['status']
 
                         );
                         break;
@@ -303,6 +368,7 @@ class ItemController extends REST_Controller
                             'item_id' => $items[$i]['id']
                         );
                         $repo = $this->repository->get($con);
+                        $barangay = $this->barangay->get(array('id' => $repo['brgy_id']));
 
                         $feed_items[$i] = array(
                             "id" => $items[$i]['id'],
@@ -315,11 +381,21 @@ class ItemController extends REST_Controller
                             "image_url" => 'uploads/found/' . $found['item_image'],
                             "published_at" => $items[$i]['published_at'],
                             "item_surrendered" => $repo['item_received'] == "Yes" ? true : false,
-                            "brgy_id" => $repo['brgy_id'] != null ? $repo['brgy_id'] : "",
+                            "date_surrendered" => $repo['date_item_received'],
+                            "barangay_info" => array(
+                                "id" => (int)$barangay['id'],
+                                "name" => ucwords(strtolower($barangay['name'])),
+                                "address" => $barangay['address'],
+                                "district_no" => (int)$barangay['district_no'],
+                                "latitude" => $barangay['latitude'],
+                                "longitude" => $barangay['longitude']
+                            ),
                             "account" => array(
                                 "id" => $account_data['id'],
-                                "username" => $account_data['username'],
-                                "name" => $account_data['name']
+                                "first_name" => $account_data['first_name'],
+                                'middle_name' => $account_data['middle_name'],
+                                'last_name' => $account_data['last_name'],
+                                'image_url' => $account_data['image']
                             ),
                             "location_info" => array(
                                 "id" => $location_info['id'],
@@ -327,7 +403,8 @@ class ItemController extends REST_Controller
                                 "address" => $location_info['address'],
                                 "latitude" => $location_info['latitude'],
                                 "longitude" => $location_info['longitude']
-                            )
+                            ),
+                            "item_status" => $items[$i]['status']
 
                         );
                         break;
@@ -350,6 +427,291 @@ class ItemController extends REST_Controller
                 "feed_items" => array()
             ), REST_Controller::HTTP_BAD_REQUEST);
         }
+    }
+
+    //add person and pet feed
+    public function feed_v2_get()
+    {
+        //Get Filter Value from clients
+        $filter = $this->get('filter');
+        $account_id = $this->get('account_id');
+        $lost_item = $this->lost_item->get();
+        $found_item = $this->found_item->get();
+        $pet = $this->pet_model->get();
+        $person = $this->person_model->get();
+        $items = $this->item->get(array('conditions' => array('status' => 'New')));
+        $feed_items = array();
+
+
+        //null array fix
+        $lost_item = $lost_item != NULL ? $lost_item : array();
+        $found_item = $found_item != NULL ? $found_item : array();
+        $pet = $pet != NULL ? $pet : array();
+        $person = $person != NULL ? $person : array();
+
+//        echo count($items);
+        //TODO Get All reported item like personal things, pets and person
+        for ($i = 0; $i < count($items); $i++) {
+            //do the magic here get all the data from items and make a response
+            $account_data = $this->account->get(array("id" => $items[$i]['account_id'])); //get account_data
+
+            foreach ($lost_item as $row) {
+                $location_data = $this->item_location->get(array("id" => $row['location_id']));
+                if ($items[$i]['item_id'] == $row['id'] && $items[$i]['type'] == "Lost") {
+                    $feed_items[$i] = array(
+                        "id" => $items[$i]['id'],
+                        "item_id" => $items[$i]['item_id'],
+                        "type" => $items[$i]['type'],
+                        "published_at" => $items[$i]['published_at'],
+                        "date_modified" => $items[$i]['date_modified'],
+                        "status" => $items[$i]['status'],
+                        "account_info" => array(
+                            "id" => $account_data['id'],
+                            "first_name" => $account_data['first_name'],
+                            'middle_name' => $account_data['middle_name'],
+                            'last_name' => $account_data['last_name'],
+                            'image_url' => $account_data['image']
+                        ),
+                        "lost_item_data" => array(
+                            "item_name" => ucwords(strtolower($row['item_name'])),
+                            "date" => $row['date_lost'],
+                            "category" => $row['item_category'],
+                            "reward" => (double)$row['reward'],
+                            "brand" => ucfirst($row['brand']),
+                            "color" => ucfirst($row['item_color']),
+                            "description" => ucfirst($row['item_description']),
+                            "item_image" => 'uploads/lost/' . $row['item_image'],
+                            "location_info" => array(
+                                "id" => $location_data['id'],
+                                "name" => $location_data['name'],
+                                "address" => $location_data['address'],
+                                "latitude" => $location_data['latitude'],
+                                "longitude" => $location_data['longitude']
+                            )
+                        )
+                    );
+                }
+            }
+            foreach ($found_item as $row) {
+                $location_data = $this->item_location->get(array("id" => $row['location_id']));
+                if ($items[$i]['item_id'] == $row['id'] && $items[$i]['type'] == "Found") {
+                    $con['returnType'] = 'single';
+                    $con['conditions'] = array(
+                        'item_id' => $items[$i]['id']
+                    );
+                    $repo = $this->repository->get($con);
+                    $barangay = $this->barangay->get(array('id' => $repo['brgy_id']));
+                    $feed_items[$i] = array(
+                        "id" => $items[$i]['id'],
+                        "item_id" => $items[$i]['item_id'],
+                        "type" => $items[$i]['type'],
+                        "published_at" => $items[$i]['published_at'],
+                        "date_modified" => $items[$i]['date_modified'],
+                        "status" => $items[$i]['status'],
+                        "account_info" => array(
+                            "id" => $account_data['id'],
+                            "first_name" => $account_data['first_name'],
+                            'middle_name' => $account_data['middle_name'],
+                            'last_name' => $account_data['last_name'],
+                            'image_url' => $account_data['image']
+                        ),
+                        "found_item_data" => array(
+                            "item_name" => ucwords(strtolower($row['item_name'])),
+                            "date" => $row['date_found'],
+                            "category" => $row['item_category'],
+                            "brand" => ucfirst($row['brand']),
+                            "color" => ucfirst($row['item_color']),
+                            "description" => ucfirst($row['item_description']),
+                            "item_image" => 'uploads/found/' . $row['item_image'],
+                            "item_surrendered" => $repo['item_received'] == "Yes" ? true : false,
+                            "date_surrendered" => $repo['date_item_received'],
+                            "barangay_info" => array(
+                                "id" => (int)$barangay  ['id'],
+                                "name" => ucwords(strtolower($barangay['name'])),
+                                "address" => $barangay['address'],
+                                "district_no" => (int)$barangay['district_no'],
+                                "latitude" => $barangay['latitude'],
+                                "longitude" => $barangay['longitude']
+                            ),
+                            "location_info" => array(
+                                "id" => $location_data['id'],
+                                "name" => $location_data['name'],
+                                "address" => $location_data['address'],
+                                "latitude" => $location_data['latitude'],
+                                "longitude" => $location_data['longitude']
+                            )
+                        )
+                    );
+
+                }
+            }
+            foreach ($pet as $row) {
+                $location_data = $this->item_location->get(array("id" => $row['location_id']));
+                if ($items[$i]['item_id'] == $row['id']) {
+                    switch ($items[$i]['type']) {
+                        case "Lost":
+                            $feed_items[$i] = array(
+                                "id" => $items[$i]['id'],
+                                "item_id" => $items[$i]['item_id'],
+                                "type" => $items[$i]['type'],
+                                "published_at" => $items[$i]['published_at'],
+                                "date_modified" => $items[$i]['date_modified'],
+                                "status" => $items[$i]['status'],
+                                "account_info" => array(
+                                    "id" => $account_data['id'],
+                                    "first_name" => $account_data['first_name'],
+                                    'middle_name' => $account_data['middle_name'],
+                                    'last_name' => $account_data['last_name'],
+                                    'image_url' => $account_data['image']
+                                ),
+                                "pet_info" => array(
+                                    "name" => ucfirst($row['pet_name']),
+                                    "type" => $row['type'],
+                                    "breed" => $row['breed'],
+                                    "date" => $row['date'],
+                                    "condition" => $row['pet_condition'],
+                                    "description" => $row['description'],
+                                    "pet_image" => 'uploads/lost/pets/' . $row['pet_image'],
+                                    "reward" => (double)$row['reward'],
+                                    "location_info" => array(
+                                        "id" => $location_data['id'],
+                                        "name" => $location_data['name'],
+                                        "address" => $location_data['address'],
+                                        "latitude" => $location_data['latitude'],
+                                        "longitude" => $location_data['longitude']
+                                    )
+                                )
+                            );
+                            break;
+                        case "Found":
+                            $feed_items[$i] = array(
+                                "id" => $items[$i]['id'],
+                                "item_id" => $items[$i]['item_id'],
+                                "type" => $items[$i]['type'],
+                                "published_at" => $items[$i]['published_at'],
+                                "date_modified" => $items[$i]['date_modified'],
+                                "status" => $items[$i]['status'],
+                                "account_info" => array(
+                                    "id" => $account_data['id'],
+                                    "first_name" => $account_data['first_name'],
+                                    'middle_name' => $account_data['middle_name'],
+                                    'last_name' => $account_data['last_name'],
+                                    'image_url' => $account_data['image']
+                                ),
+                                "pet_info" => array(
+                                    "name" => ucfirst($row['pet_name']),
+                                    "type" => $row['type'],
+                                    "breed" => $row['breed'],
+                                    "date" => $row['date'],
+                                    "condition" => $row['pet_condition'],
+                                    "description" => $row['description'],
+                                    "pet_image" => 'uploads/found/pets/' . $row['pet_image'],
+                                    "location_info" => array(
+                                        "id" => $location_data['id'],
+                                        "name" => $location_data['name'],
+                                        "address" => $location_data['address'],
+                                        "latitude" => $location_data['latitude'],
+                                        "longitude" => $location_data['longitude']
+                                    )
+                                )
+                            );
+                            break;
+                    }
+
+
+                }
+            }
+            foreach ($person as $row) {
+                $location_data = $this->item_location->get(array("id" => $row['location_id']));
+                if ($items[$i]['item_id'] == $row['id']) {
+                    switch ($items[$i]['type']) {
+                        case "Lost":
+                            $feed_items[$i] = array(
+                                "id" => $items[$i]['id'],
+                                "item_id" => $items[$i]['item_id'],
+                                "type" => $items[$i]['type'],
+                                "published_at" => $items[$i]['published_at'],
+                                "date_modified" => $items[$i]['date_modified'],
+                                "status" => $items[$i]['status'],
+                                "account_info" => array(
+                                    "id" => $account_data['id'],
+                                    "first_name" => $account_data['first_name'],
+                                    'middle_name' => $account_data['middle_name'],
+                                    'last_name' => $account_data['last_name'],
+                                    'image_url' => $account_data['image']
+                                ),
+                                "person_info" => array(
+                                    "first_name" => $row['first_name'],
+                                    "middle_name" => $row['middle_name'],
+                                    "last_name" => $row['last_name'],
+                                    "age_group" => $row['age_group'],
+                                    "sex" => $row['sex'],
+                                    "date" => $row['date'],
+                                    "reward" => (double)$row['reward'],
+                                    "person_image" => 'uploads/lost/persons/' . $row['person_image'],
+                                    "location_info" => array(
+                                        "id" => $location_data['id'],
+                                        "name" => $location_data['name'],
+                                        "address" => $location_data['address'],
+                                        "latitude" => $location_data['latitude'],
+                                        "longitude" => $location_data['longitude']
+                                    )
+                                )
+                            );
+                            break;
+                        case "Found":
+                            $feed_items[$i] = array(
+                                "id" => $items[$i]['id'],
+                                "item_id" => $items[$i]['item_id'],
+                                "type" => $items[$i]['type'],
+                                "published_at" => $items[$i]['published_at'],
+                                "date_modified" => $items[$i]['date_modified'],
+                                "status" => $items[$i]['status'],
+                                "account_info" => array(
+                                    "id" => $account_data['id'],
+                                    "first_name" => $account_data['first_name'],
+                                    'middle_name' => $account_data['middle_name'],
+                                    'last_name' => $account_data['last_name'],
+                                    'image_url' => $account_data['image']
+                                ),
+                                "person_info" => array(
+                                    "first_name" => $row['first_name'],
+                                    "middle_name" => $row['middle_name'],
+                                    "last_name" => $row['last_name'],
+                                    "age_group" => $row['age_group'],
+                                    "sex" => $row['sex'],
+                                    "date" => $row['date'],
+                                    "person_image" => 'uploads/found/persons/' . $row['person_image'],
+                                    "location_info" => array(
+                                        "id" => $location_data['id'],
+                                        "name" => $location_data['name'],
+                                        "address" => $location_data['address'],
+                                        "latitude" => $location_data['latitude'],
+                                        "longitude" => $location_data['longitude']
+                                    )
+                                )
+                            );
+                            break;
+
+                    }
+                }
+            }
+
+        }
+
+        if ($feed_items) {
+            $this->response(array(
+                "error" => false,
+                "total_results" => count($feed_items),
+                "feed_items" => $feed_items
+            ), REST_Controller::HTTP_OK);
+        } else {
+            $this->response(array(
+                "error" => true,
+                "total_results" => count($feed_items)
+            ), REST_Controller::HTTP_OK);
+        }
+
     }
 
     public function total_get()
@@ -500,6 +862,57 @@ class ItemController extends REST_Controller
 
         } else {
             $this->response("Found Items are required", REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function search_get()
+    {
+        $query = $this->get('q');
+
+
+        if (isset($query)) {
+
+
+        } else {
+
+
+        }
+    }
+
+    public function update_item_status_put()
+    {
+        $new_status = $this->put('status'); //get the status value
+        $id = $this->put('id'); //get item id
+        //Check if status is not empty
+        if (isset($new_status, $id)) {
+            //Check first if item exist
+            $is_item_exist = $this->item->get(array('id' => $id));
+            //Validate Result
+            if ($is_item_exist) {
+                $result = $this->item->update_status($id, $new_status); //Execute status update
+                //Check update result
+                if ($result == true) {
+                    $this->response(array(
+                        'failed' => false,
+                        'message' => 'Status update success'
+                    ), REST_Controller::HTTP_OK);
+                } else {
+                    //set response OK but failed
+                    $this->response(array(
+                        'failed' => true,
+                        'message' => 'Status update failed'
+                    ), REST_Controller::HTTP_OK);
+                }
+            } else {
+                //set response OK but failed
+                $this->response(array(
+                    'failed' => true,
+                    'message' => 'Item not found'
+                ), REST_Controller::HTTP_OK);
+            }
+
+        } else {
+            $this->response("Status and item id is required", REST_Controller::HTTP_BAD_REQUEST);
         }
     }
 }

@@ -81,6 +81,14 @@ class Lost_item extends CI_Model
         //return the status
         return $delete ? true : false;
     }
+    
+    
+            // Admin's custom model -------------------------------------------------
+	public function count_lost_items(){
+            $query = $this->db->query('SELECT * FROM lost_item');
+            
+            return $query->num_rows();
+	}
 }
 
 /* End of file .php */
