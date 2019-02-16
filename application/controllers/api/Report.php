@@ -315,7 +315,7 @@ class Report extends REST_Controller
                             'item_id' => $result,
                             'type' => $report_type,
                             'status' => 'New',
-                            'return_type' => 'Person',
+                            'report_type' => 'Person',
                             'account_id' => $person_data['account_id']
                         );
                         $item_id = $this->item->insert($item); // If insert success returns the insert id else false
