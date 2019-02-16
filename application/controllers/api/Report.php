@@ -60,6 +60,7 @@ class Report extends REST_Controller
                         'item_id' => $insert_result,
                         'type' => 'Lost',
                         'status' => 'New',
+                        'return_type' => 'Personal Thing',
                         'account_id' => $lost_item['account_id']
                     );
                     $item_id = $this->item->insert($item);
@@ -128,6 +129,7 @@ class Report extends REST_Controller
                         'item_id' => $insert_result,
                         'type' => 'Found',
                         'status' => 'New',
+                        'return_type' => 'Personal Thing',
                         'account_id' => $found_item['account_id']
                     );
                     $item_id = $this->item->insert($item);
@@ -222,6 +224,7 @@ class Report extends REST_Controller
                             'item_id' => $result,
                             'type' => $report_type,
                             'status' => 'New',
+                            'report_type' => 'Pet',
                             'account_id' => $pet_data['account_id']
                         );
                         $item_id = $this->item->insert($item); // If insert success returns the insert id else false
@@ -312,6 +315,7 @@ class Report extends REST_Controller
                             'item_id' => $result,
                             'type' => $report_type,
                             'status' => 'New',
+                            'return_type' => 'Person',
                             'account_id' => $person_data['account_id']
                         );
                         $item_id = $this->item->insert($item); // If insert success returns the insert id else false
