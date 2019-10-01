@@ -1,0 +1,38 @@
+
+
+
+.nav-pills > li > a.active {
+  background-color:#42A5F5 !important;
+  color: #FFCE54 !important;
+}
+
+.nav-pills > li > a:hover {
+  color: #EFA50B !important;
+}
+
+.nav-link-color {
+  color: #757575
+}
+
+/* BEGIN Custom pagination color */
+.pagination .page-item.active .page-link { 
+	background-color: #42A5F5;
+	color: white; 
+}
+
+div.dataTables_wrapper div.dataTables_paginate ul.pagination .page-item.active .page-link:focus {
+background-color: #42A5F5;
+
+}
+
+.pagination .page-item.active .page-link:hover {
+background-color: #42A5F5;
+
+}
+/* BEGIN Custom pagination color */
+
+nav{
+	-webkit-box-shadow: 0px 3px 5px -3px rgba(0,0,0,0.75);
+	-moz-box-shadow: 0px 3px 5px -3px rgba(0,0,0,0.75);
+	box-shadow: 0px 3px 5px -3px rgba(0,0,0,0.75);
+}

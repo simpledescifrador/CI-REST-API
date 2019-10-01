@@ -124,4 +124,27 @@ class Auth extends REST_Controller
             $this->response("Card number and password is required", REST_Controller::HTTP_BAD_REQUEST);
         }
     }
+
+    public function register_token_post()
+    {
+        $token = $this->post('token');
+        $account_id = $this->post('account_id');
+
+        if (isset($token, $account_id)) {
+            $result = $this->account->add_token($token, $account_id);
+
+            if ($result) { // Insert token Sucess
+                $this->response(array(
+                    "success" => true,
+                    "message" => "Token Sucessfully Registered"
+                ), REST_Controller::HTTP_OK);
+
+            } else {
+                $this->response('Token Failed to Register', REST_Controller::HTTP_BAD_REQUEST);
+            }
+        } else {
+            $this->response('Token and account id is required', REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+    }
 }

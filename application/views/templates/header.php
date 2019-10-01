@@ -1,108 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-textdirection="ltr" class="loading">
   <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
     <title><?php echo $page_title; ?></title>
-
-    <!-- Bootstrap -->
-    <link href="assets/css/bootstrap-4.0.0.css" rel="stylesheet">
-  	<link rel="stylesheet" href="assets/css/Sidebar-Menu.css">
-	  <link rel="stylesheet" href="assets/fonts/font-awesome/css/font-awesome.css">
-	  <link href="assets/css/dashboard.css" rel="stylesheet" type="text/css">
-
-     <!-- Morris Charts CSS -->
-     <link href="assets/morrisjs/morris.css" rel="stylesheet">
-
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="assets/DataTables/datatables.min.css"/>
-    <!-- /DataTables CSS -->
-
+    <link rel="shortcut icon" type="image/png" href="<?php echo base_url(); ?>assets/custom/img/m-circle.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <!-- BEGIN VENDOR CSS-->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/bootstrap.css">
+    <!-- font icons-->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/fonts/icomoon.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/fonts/flag-icon-css/css/flag-icon.min.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/vendors/css/extensions/pace.css">
+    <!-- END VENDOR CSS-->
+    <!-- BEGIN ROBUST CSS-->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/bootstrap-extended.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/app.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/colors.css">
+    <!-- END ROBUST CSS-->
+    <!-- BEGIN Page Level CSS-->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/core/menu/menu-types/vertical-menu.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/core/menu/menu-types/vertical-overlay-menu.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/app-assets/css/core/colors/palette-gradient.css">
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>/assets/DataTables/datatables.min.css">
+    <!-- END Page Level CSS-->
+    <!-- BEGIN Lightbox -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.1/css/lightbox.min.css">
+    <!-- END Lightbox -->
+    <!-- BEGIN Custom CSS-->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(); ?>assets/custom/css/custom.css">
+    <!-- END Custom CSS-->
+    <script src="<?php echo base_url(); ?>assets/app-assets/js/core/libraries/jquery.min.js" type="text/javascript"></script>
   </head>
-  <body>
- 
-<div id="wrapper">
-        <div id="sidebar-wrapper" class="bg-light">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand"> <a href="#"><b>MakaHanap</b> </a></li>
-                <li> <a href="<?php echo site_url('dashboard'); ?>"><em class="fa fa-dashboard"></em> &nbsp;Dashboard </a></li>
-                <li>
-               	 <a href="#itemSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><em class="fa fa-list"></em> &nbsp;Items&ensp;&ensp;&ensp;&emsp;&ensp;&ensp;</a>
-               	 <ul class="collapse list-unstyled bg-secondary " id="itemSubmenu" style="font-size: .8rem;">
-                	   <li>
-                	       <a href="<?php echo site_url('repository'); ?>">&emsp;&emsp;&emsp;Repository</a>
-                	   </li>
-               	     <li>
-               	         <a href="reported_lost">&emsp;&emsp;&emsp;Lost Items</a>
-               	     </li>
-                    <li>
-               	         <a href="reported_found">&emsp;&emsp;&emsp;Found Items</a>
-               	     </li>
-                      <li>
-               	         <a href="#">&emsp;&emsp;&emsp;Matched Items</a>
-               	     </li>
-                      <li>
-               	         <a href="#">&emsp;&emsp;&emsp;Returned Items</a>
-               	     </li>
-                      <li>
-               	         <a href="#">&emsp;&emsp;&emsp;Disposed Items</a>
-               	     </li>
-               	  </ul>
-            	  </li>
-                <li>
-               	 <a href="#b_submenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><em class="fa fa-road"></em> &nbsp;Baranggay &emsp;</a>
-               	 <ul class="collapse list-unstyled bg-secondary" id="b_submenu" style="font-size:.8rem">
-                	   <li>
-                	       <a href="#">&emsp;&emsp;&emsp;District &ensp;I</a>
-                	   </li>
-               	     <li>
-               	         <a href="#">&emsp;&emsp;&emsp;District &ensp;II</a>
-               	     </li>
-               	  </ul>
-            	  </li>
-                <li> <a href="<?php echo site_url('users_controller'); ?>"><em class="fa fa-users"></em> &nbsp;Users </a></li>
-                <li> <a href="#"><em class="fa fa-file"></em> &nbsp;Reports </a></li>
-                <li> <a href="#"><em class="fa fa-comment"></em> &nbsp;Feedbacks </a></li>
-				        <li> <a href="#"><em class="fa fa-gears"></em> &nbsp;Settings </a></li>
-                
-            </ul>
+
+  <body data-open="click" data-menu="vertical-menu" data-col="2-columns" class="vertical-layout vertical-menu 2-columns  fixed-navbar">
+    <!-- navbar-fixed-top-->
+    <nav class="header-navbar navbar navbar-with-menu navbar-fixed-top navbar-semi-dark navbar-shadow">
+      <div class="navbar-wrapper">
+        <div class="navbar-header bg-blue bg-darken-1">
+          <ul class="nav navbar-nav">
+            <li class="nav-item mobile-menu hidden-md-up float-xs-left"><a class="nav-link nav-menu-main menu-toggle hidden-xs"><i class="icon-menu5 font-large-1"></i></a></li>
+            <li class="nav-item"><a href="dashboard.html" class="navbar-brand nav-link"><img alt="branding logo" src="<?php echo base_url(); ?>assets/custom/img/nav-logo-light.png" data-expand="<?php echo base_url(); ?>assets/custom/img/nav-logo-light.png" data-collapse="<?php echo base_url(); ?>assets/custom/img/m-circle-tiny.png" class="brand-logo"></a></li>
+            <li class="nav-item hidden-md-up float-xs-right"><a data-toggle="collapse" data-target="#navbar-mobile" class="nav-link open-navbar-container"><i class="icon-ellipsis pe-2x icon-icon-rotate-right-right"></i></a></li>
+          </ul>
         </div>
-
-        <!-- This container emulates the body -->
-        <div class="page-content-wrapper">
-		  <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-	 <a class="navbar-brand" role="button" href="#menu-toggle" id="menu-toggle" ><i class="fa fa-bars"></i></a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarColor01">
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="text" placeholder="Search Items">
-      <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
-    </form>
-    <ul class="navbar-nav mr-auto">
-    </ul>
-	  <ul class="navbar-nav ">
-      <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#lost_item_modal">
-        <i class="fa fa-plus" ></i> 
-        Lost Item
-      </button>&nbsp;&nbsp;&nbsp;&nbsp;
-      <button type="button" class="btn btn-success" data-toggle="modal" data-target="#found_item_modal">
-        <i class="fa fa-plus" ></i> 
-        Found Item
-      </button>
-	    <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><?php echo $this->session->userdata['logged_in']['username']; ?></a>
-    <div class="dropdown-menu dropdown-menu-right">
-      <a class="dropdown-item" href="#">Edit Account Info</a>
-      <a class="dropdown-item" href="#">Add New User</a>
-      <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="<?php echo site_url('logout'); ?>">Sign Out</a>
-    </div>
-  </li>  
-     
-    </ul>
-  </div>
-</nav>
+        <div class="navbar-container content container-fluid">
+          <div id="navbar-mobile" class="collapse navbar-toggleable-sm">
+            <ul class="nav navbar-nav">
+              <li class="nav-item hidden-sm-down"><a class="nav-link nav-menu-main menu-toggle hidden-xs"><i class="icon-menu5">         </i></a></li>
+            </ul>
+            <ul class="nav navbar-nav float-xs-right">
+              <li class="nav-item">
+                <a data-toggle="modal" data-target="#found_item_modal" aria-haspopup="true" aria-expanded="false" class="nav-link">
+                  <i class="icon-plus success"></i>
+                  <span class="selected-language">Create Barangay Account</span>
+                </a>
+              </li>
+              <li class="dropdown dropdown-user nav-item"><a href="#" data-toggle="dropdown" class="dropdown-toggle nav-link dropdown-user-link"><span class="avatar avatar-online"><img src="<?php echo base_url(); ?>/assets/app-assets/images/portrait/small/avatar-s-1.png" alt="avatar"><i></i></span><span class="user-name">Admin User</span></a>
+                <div class="dropdown-menu dropdown-menu-right"><a href="#" class="dropdown-item"><i class="icon-head"></i> Edit Profile</a><a href="#" class="dropdown-item"><i class="icon-mail6"></i> My Inbox</a><a href="#" class="dropdown-item"><i class="icon-clipboard2"></i> Task</a><a href="#" class="dropdown-item"><i class="icon-calendar5"></i> Calender</a>
+                  <div class="dropdown-divider"></div><a href="<?php echo site_url('logout'); ?>" class="dropdown-item"><i class="icon-power3"></i> Logout</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>

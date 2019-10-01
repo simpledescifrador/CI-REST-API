@@ -11,7 +11,7 @@ class Lost_item extends CI_Model
         $this->table_name = 'lost_item';
     }
 
-    public function get($params = null)
+    public function get($params = array())
     {
         $this->db->select('*');
         $this->db->from($this->table_name);
@@ -81,14 +81,75 @@ class Lost_item extends CI_Model
         //return the status
         return $delete ? true : false;
     }
+
+
     
-    
-            // Admin's custom model -------------------------------------------------
-	public function count_lost_items(){
-            $query = $this->db->query('SELECT * FROM lost_item');
-            
-            return $query->num_rows();
-	}
+    // barangay custom model
+    public function view_lost(){ #view all lost items
+        $this->db->select("*");
+        $this->db->from("v_lostitems");
+        $this->db->where("post_status = 'New'");
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
+    public function recently_lost(){
+        $this->db->select("*");
+        $this->db->from("v_lostitems");
+        $this->db->where("post_status = 'New'");
+        $this->db->order_by('date_created', 'desc');
+        $this->db->limit(9);
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function lost_details($item_id){
+            $this->db->select("*");
+            $this->db->from("v_lostitems");
+            $this->db->where('item_id = ', $item_id);
+            $query = $this->db->get();
+
+            return $query->result_array();
+    }
+
+    //admin custom model
+    public function lost_pets(){ //get newly posted lost pets
+        $this->db->select("*");
+        $this->db->from("v_pets");
+        $this->db->where("type = 'Lost' AND post_status = 'New'");
+
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
+    public function lost_pet_details($item_id){
+            $this->db->select("*");
+            $this->db->from("v_pets");
+            $this->db->where('item_id = ', $item_id);
+            $query = $this->db->get();
+
+            return $query->result_array();
+    }
+    public function lost_person_details($item_id){
+            $this->db->select("*");
+            $this->db->from("v_person");
+            $this->db->where('item_id = ', $item_id);
+            $query = $this->db->get();
+
+            return $query->result_array();
+    }
+
+    public function lost_person(){ //get newly posted lost persons
+        $this->db->select("*");
+        $this->db->from("v_person");
+        $this->db->where("report_type = 'Lost' AND item_status = 'New'");
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
 }
 
 /* End of file .php */

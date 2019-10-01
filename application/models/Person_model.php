@@ -55,4 +55,7 @@ class Person_model extends CI_Model
         //return the status
         return $query_result ? $this->db->insert_id() : false;
     }
+
+    // admin functions
+ 
 }

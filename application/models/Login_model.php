@@ -2,7 +2,7 @@
 
 class Login_model extends CI_model{
 
-    
+
     public function __construct()
     {
         parent::__construct();
@@ -28,10 +28,10 @@ class Login_model extends CI_model{
 			$this->db->where($condition);
 			$this->db->limit(1);
 			$query = $this->db->get();
-			if ($query->num_rows() == 1) 
+			if ($query->num_rows() == 1)
 			{
 				return $query->result();
-			} else 
+			} else
 				{
 					return FALSE;
 				}
@@ -39,5 +39,16 @@ class Login_model extends CI_model{
 
     public function current_user(){
         //$query = "SELECT * FROM user WHERE username like ";
+    }
+
+    public function user_info($brgy_id){
+        //$query = "SELECT * FROM user WHERE username like ";
+         $this->db->select("*");
+        $this->db->from("barangay");
+        $this->db->where(array("id" => $brgy_id));
+
+        $query = $this->db->get();
+
+        return $query->result_array();
     }
 }

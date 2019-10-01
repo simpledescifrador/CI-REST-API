@@ -11,7 +11,7 @@ class Found_item extends CI_Model
         $this->table_name = "found_item";
     }
 
-    public function get($params = null)
+    public function get($params = array())
     {
         $this->db->select('*');
         $this->db->from($this->table_name);
@@ -82,11 +82,83 @@ class Found_item extends CI_Model
         return $delete ? true : false;
     }
 
-    public function count_found()
-    {
 
-        $query = $this->db->query('SELECT * FROM found_item');
-        return $query->num_rows();
+
+    //barangay functions
+    public function view_foundItems(){
+        $this->db->select("*");
+        $this->db->from("v_founditems");
+        $this->db->where("post_status = 'New'");
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function recently_found(){
+        $this->db->select("*");
+        $this->db->from("v_founditems");
+        $this->db->order_by('date_created', 'desc');
+        $this->db->where("post_status = 'New'");
+        $this->db->limit(9);
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
+    public function view_fdetails($item_id){
+        $this->db->select("*");
+        $this->db->from("v_founditems");
+        $this->db->where('item_id = ', $item_id);
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+
+    //admin custom functions
+    public function found_person(){
+        $this->db->select("*");
+        $this->db->from("v_person");
+        $this->db->where("report_type = 'Found' AND item_status = 'New'");
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function foundPerson_details($item_id){
+        $this->db->select('*');
+        $this->db->from('v_person');
+        $this->db->where('item_id = ', $item_id);
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function foundPet_details($item_id){
+        $this->db->select('*');
+        $this->db->from('v_pets');
+        $this->db->where('item_id = ', $item_id);
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function view_returnedItems(){
+        $this->db->select("*");
+        $this->db->from("v_founditems");
+        $this->db->where("post_status = 'Returned'");
+        $query = $this->db->get();
+
+        return $query->result_array();
+    }
+    public function view_successTransactions(){
+        $this->db->select('*');
+        $this->db->from('transaction');
+        $query = $this->db->get();
+        return $query->result_array();
+    }
+    public function found_pet(){
+        $this->db->select("*");
+        $this->db->from("v_pets");
+        $this->db->where("type = 'Found' AND post_status = 'New'");
+        $query = $this->db->get();
+
+        return $query->result_array();
     }
 }
 

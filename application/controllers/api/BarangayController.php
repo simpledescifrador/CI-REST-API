@@ -44,9 +44,7 @@ class BarangayController extends REST_Controller
                     'longitude' => $barangay_info[$i]['longitude']
                 );
             }
-
             $data['total'] = $barangay_size;
-
         }
 
         if ($barangay_info) {
