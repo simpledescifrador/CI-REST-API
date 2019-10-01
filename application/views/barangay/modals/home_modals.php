@@ -126,11 +126,12 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
-					<b>Change Password <span class="text-danger">(Not Yet Finish!)</span></b>
+					<b>Change Password</b>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 					</button>
 				</div>
+				<div id="alert-msg"></div>
 				<div class="modal-body">
 					<div class="form-group">
                         <label for="txt_currentPassword">Current Password</label>
@@ -146,10 +147,14 @@
 					</ul>
 					</small>
 
-                    <div class="form-group">
+					<fieldset class="form-group position-relative has-icon-right">
                         <label for="txt_newPassword">New Password</label>
-                        <input type="password" class="form-control" id="txt_newPassword" name="new_password" placeholder="Enter your new password">
-                    </div>
+						<input type="password" class="form-control" id="txt_newPassword" name="new_password" placeholder="Enter your new password">
+						<div class="form-control-position" style="margin-top: 27px;">
+							<a class="icon-eye3" onclick="myFunction()" data-toggle="tooltip" title="Show/Hide Password" id="pw-icon" data-placement="top" >
+							</a>
+						</div>
+					</fieldset>
                     <div class="form-group">
                         <label for="txt_repeatPassword">Repeat Password</label>
                         <input type="password" class="form-control" id="txt_repeatPassword" name="repeat_password" placeholder="Repeat new password">
@@ -162,3 +167,22 @@
 			</div>
 		</div>
 	</div>
+
+	<script type="text/javascript">
+        function myFunction() {
+              var x = document.getElementById("txt_newPassword");
+              var y = document.getElementById("pw-icon");
+
+              if (x.type === "password") {
+                x.type = "text";
+                document.getElementById("pw-icon").className = "icon-eye-blocked";
+                y.setAttribute("title", "Hide Password");
+                y.setAttribute("data-toggle", "none");
+              } else {
+                y.setAttribute("title", "Show Password");
+                y.setAttribute("data-toggle", "tooltip");
+                x.type = "password";
+                document.getElementById("pw-icon").className = "icon-eye3";
+              }
+            }
+    </script>

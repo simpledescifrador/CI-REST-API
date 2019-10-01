@@ -935,4 +935,91 @@ class Barangay_home extends CI_Controller{
                 break;
         }
     }
+
+    public function change_password()
+    {
+        $this->load->library('form_validation'); //Load Form Validation
+
+        //Set Form Rules
+        $this->form_validation->set_rules('current_password', 'Current Password', 'trim|required|callback_check_current_password');
+        $this->form_validation->set_rules('new_password', 'New Password', 'trim|required|min_length[8]|callback_password_regex_validator|differs[password]');
+        $this->form_validation->set_rules('repeat_password', 'Repeat Password', 'trim|required|matches[new_password]',
+            array(
+                'matches' => "The New Password not match!"
+            )
+        );
+
+        if ($this->form_validation->run() == FALSE) {
+            /* Failed Form Validation */
+            echo validation_errors();
+		} else {
+            $user_id = $this->session->userdata['b_logged_in']['user_id'];
+
+            //Get Brgy USer Data
+            $con['returnType'] = 'single';
+            $con['conditions'] = array(
+                'brgy_account_id' => $user_id
+            );
+
+            $user_data = $this->barangay->get_brgyuser_details($con);
+            $new_password = $this->input->post('new_password');
+            $data = array(
+                'password' => $new_password
+            );
+
+            $success = $this->user->update($data, $user_data['brgy_account_id']);
+
+            if ($success) {
+                echo 'Success';
+            } else {
+                echo 'Error';
+            }
+
+        }
+    }
+
+    public function check_current_password($password)
+    {
+        $user_id = $this->session->userdata['b_logged_in']['user_id'];
+
+        //Get Brgy USer Data
+        $con['returnType'] = 'single';
+        $con['conditions'] = array(
+            'brgy_account_id' => $user_id
+        );
+
+        $user_data = $this->barangay->get_brgyuser_details($con);
+
+        $is_valid = $this->user->getRows(array(
+            'returnType' => 'single',
+            'conditions' => array(
+                'id' => $user_data['brgy_account_id'],
+                'password' => $password
+            )
+        ));
+
+        if ($is_valid) {
+            return TRUE;
+        } else {
+            $this->form_validation->set_message('check_current_password', 'The {field} is invalid');
+            return FALSE;
+        }
+    }
+
+    public function password_regex_validator($password)
+    {
+        if (!preg_match('#[0-9]#', $password))
+        {
+            $this->form_validation->set_message('password_regex_validator', 'The {field} is must have at least one number.');
+            return FALSE;
+        } else if (preg_match_all("/[!@#$%^&*()\-_=+{};:,<.>§~]/", $password) < 1) {
+            $this->form_validation->set_message('password_regex_validator', 'The {field} is must have at least one special character.' . ' ' . htmlentities('!@#$%^&*()\-_=+{};:,<.>§~'));
+            return FALSE;
+        } else if (!preg_match('/^\S{8,}$/', $password)) {
+            $this->form_validation->set_message('password_regex_validator', 'The {field} is must not contain spaces.');
+            return FALSE;
+        } else{
+          return TRUE;
+        }
+    }
 }

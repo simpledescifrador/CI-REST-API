@@ -520,6 +520,42 @@ $(document).ready(function() {
   $('#logout').click(function() {
     window.location.href = "<?php echo base_url();?>b_logout";
   });
+
+  /* Change Password AJAX */
+  $('#change-password').click(function() {
+    var form_data = {
+        current_password: $('#txt_currentPassword').val(),
+        new_password: $('#txt_newPassword').val(),
+        repeat_password: $('#txt_repeatPassword').val(),
+    };
+    $.ajax({
+      url: "<?php echo site_url('barangay/Barangay_home/change_password'); ?>",
+      type: 'POST',
+      data: form_data,
+      success: function(msg) {
+        console.log(msg);
+          if (msg == 'Success') {
+              $('#alert-msg').html('<div class="alert alert-success text-center" style="margin: 8px;">Your Password has been change successfully!<br />Please logout to confirm your new password</div>');
+              //Clear Form
+              $('#txt_currentPassword').val('');
+              $('#txt_newPassword').val('');
+              $('#txt_repeatPassword').val('');
+              setTimeout(function(){// wait for 1 secs
+                window.location.reload();
+              }, 2000);
+          } else if (msg == 'Error') {
+              $('#alert-msg').html('<div class="alert alert-danger text-center" style="margin: 8px;">Error in changing your password! Please try again later.</div>');
+              //Clear Form
+              $('#txt_currentPassword').val('');
+              $('#txt_newPassword').val('');
+              $('#txt_repeatPassword').val('');
+          } else {
+              $('#alert-msg').html('<div class="alert alert-danger" style="margin: 8px;">' + msg + '</div>');
+          }
+      }
+  });
+  return false;
+  });
 </script>
 </body>
 </html>
