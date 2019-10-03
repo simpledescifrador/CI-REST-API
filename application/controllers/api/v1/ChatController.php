@@ -333,7 +333,7 @@ class ChatController extends REST_Controller
                             $chat_rooms[$key]['item_title'] = $pet_details['breed'] . " " . $pet_details['type'];
                             break;
                         case 'Person':
-                            $person_details = $this->person_model->get(array('id' => $person_details['item_id']));
+                            $person_details = $this->person_model->get(array('id' => $item_details['item_id']));
                             $chat_rooms[$key]['item_title'] = ucfirst(strtolower($person_details['sex'] . " " . $person_details['age_group'] . " " . $person_details['age_range'])) . " years old";
                             break;
                     }
