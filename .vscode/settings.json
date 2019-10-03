@@ -37,6 +37,11 @@
 "explorer.confirmDragAndDrop": false,
 "files.trimTrailingWhitespace": true,
 "files.trimFinalNewlines": true,
+"files.watcherExclude": {
+  "**/.git/objects/**": true,
+  "**/.git/subtree-cache/**": true,
+  "**/vendor/*/**": true
+},
 // Formatting Optional.
 "terminal.integrated.macOptionIsMeta": true,
 "workbench.statusBar.feedback.visible": false,
