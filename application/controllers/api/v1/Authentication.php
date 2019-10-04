@@ -109,6 +109,81 @@ class Authentication extends REST_Controller
         }
     }
 
+    public function check_makatizen_get()
+    {
+        $makatizen_number = $this->get('makatizen_number');
+        if (isset($makatizen_number)) {
+            //Check if the makatizen id if already registered
+            $result = $this->account->get(array(
+                'returnType' => 'single',
+                'conditions' => array(
+                    'makatizen_number' => $makatizen_number
+                )
+            ));
+
+            if ($result) {
+                $this->response(array(
+                    'status' => 1,
+                    'message' => "Makatizen Number is registered",
+                    'email' => $result['email_address'],
+                    'phone' => $result['contact_number']
+                ), REST_Controller::HTTP_OK);
+            } else {
+                $this->response(array(
+                    'status' => 0,
+                    'message' => 'Makatizen Number not yet registered'
+                ), REST_Controller::HTTP_OK);
+            }
+
+        } else {
+            $this->response("Makatizen Number is required!", REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+    }
+
+    public function reset_password_post()
+    {
+        $makatizen_number = $this->post('makatizen_number');
+        $new_password = $this->post('password');
+
+        if (isset($makatizen_number, $new_password)) {
+            //Change Password
+            $data = array(
+                'password' => $new_password
+            );
+
+            //Get the account ID using makatizen_number
+            $account_data = $this->account->get(array(
+                'returnType' => 'single',
+                'conditions' => array(
+                    'makatizen_number' => $makatizen_number
+                )
+            ));
+
+            if ($account_data) {
+                $result = $this->account->update($data, $account_data['id']);
+                if ($result) {
+                    $this->response(array(
+                        'status' => 1,
+                        'message' => 'Change Password Successful'
+                    ), REST_Controller::HTTP_OK);
+                } else {
+                    $this->response(array(
+                        'status' => 0,
+                        'message' => 'Failed to Change Password'
+                    ), REST_Controller::HTTP_OK);
+                }
+            } else {
+            $this->response("Account Not found!. Database Error Occurred.", REST_Controller::HTTP_BAD_REQUEST);
+
+            }
+
+        } else {
+            $this->response("Makatizen Number & New Password is required!", REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+    }
+
     public function change_password_post()
     {
         $accountId = $this->post('account_id');
@@ -301,51 +376,42 @@ class Authentication extends REST_Controller
    public function request_password_reset_post()
    {
         $email = $this->post('email');
-        $number = $this->post('number');
-        $token = $this->post('token');
-        $via = $this->post('via');
 
-        if (isset($token, $via)) {
-            switch ($via) {
-                case 'email':
-                    //Generate 6-Alphanumeric Random Code
-                    $this->load->helper('string');
-                    $random_code = strtoupper(random_string('alnum', 6));
-                    $this->load->model('authentication_model');
+        if (isset($email)) {
+            //Generate 6-Alphanumeric Random Code
+            $this->load->helper('string');
+            $random_code = strtoupper(random_string('alnum', 6));
+            $this->load->model('authentication_model');
 
-                    $insert_success = $this->authentication_model->insert_email_verification($email, $random_code, $token);
+            $insert_success = $this->authentication_model->insert_email_verification($email, $random_code, $token);
 
-                    if ($insert_success) {
-                        //Send the code to email
-                        $config['mailtype'] = 'html';
-                        $this->load->library('email', $config);
-                        $data['code'] = $random_code;
+            if ($insert_success) {
+                //Send the code to email
+                $config['mailtype'] = 'html';
+                $this->load->library('email', $config);
+                $data['code'] = $random_code;
 
-                        $this->email->set_newline("\r\n");
-                        $this->email->from('makahana@makahanap.x10host.com', 'Maka-Hanap');
-                        $this->email->to($email);
-                        $this->email->subject('Password Reset');
-                        $this->email->message($this->load->view('templates/reset_pass_email_format.php', $data, TRUE));
-                        $result = $this->email->send();
-                        if ($result) {
-                            $this->response(array(
-                                'email_sent' => true
-                            ), REST_Controller::HTTP_OK);
-                        } else {
-                            $this->response(array(
-                                'email_sent' => false
-                            ), REST_Controller::HTTP_OK);
-                        }
-                    } else {
-                        $this->response('Database Error Occurred', REST_Controller::HTTP_BAD_REQUEST);
-                    }
-                    break;
-                case 'sms':
-                    break;
+                $this->email->set_newline("\r\n");
+                $this->email->from('makahana@makahanap.x10host.com', 'Maka-Hanap');
+                $this->email->to($email);
+                $this->email->subject('Password Reset');
+                $this->email->message($this->load->view('templates/reset_pass_email_format.php', $data, TRUE));
+                $result = $this->email->send();
+                if ($result) {
+                    $this->response(array(
+                        'email_sent' => true
+                    ), REST_Controller::HTTP_OK);
+                } else {
+                    $this->response(array(
+                        'email_sent' => false
+                    ), REST_Controller::HTTP_OK);
+                }
+            } else {
+                $this->response('Database Error Occurred', REST_Controller::HTTP_BAD_REQUEST);
             }
         } else {
             //Return Response 404 Bad Request
-            $this->response("Token & Via is required!", REST_Controller::HTTP_BAD_REQUEST);
+            $this->response("Email is required!", REST_Controller::HTTP_BAD_REQUEST);
         }
 
    }
