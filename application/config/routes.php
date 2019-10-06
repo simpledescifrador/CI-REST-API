@@ -96,6 +96,8 @@ $route['api/v1/items']['get'] = 'api/v1/itemController/latest_feed';
 $route['api/v1/items/(:num)/images']['get'] = 'api/v1/itemController/item_images/$1';
 $route['api/v1/items/(:num)']['get'] = 'api/v1/itemController/item_details/$1';
 $route['api/v1/items/map']['get'] = 'api/v1/itemController/map_items';
+$route['api/v1/items/report']['post'] = 'api/v1/itemController/report_item';
+$route['api/v1/items/check_reported']['get'] = 'api/v1/itemController/check_reported_item';
 
 //Chat
 $route['api/v1/chats']['get'] = 'api/v1/chatController/chat_rooms';

@@ -472,6 +472,56 @@ class Item extends CI_Model
         return $query->num_rows();
     }
 
+    function add_item_report($data)
+    {
+        $insert = $this->db->insert('item_reports', $data);
+
+        //return the status
+        return $insert ? $this->db->insert_id() : false;
+    }
+
+    function get_item_reports($params = array())
+    {
+        $this->db->select('*');
+        $this->db->from('item_reports');
+        if ($params != null) {
+            if (array_key_exists('conditions', $params)) {
+                foreach ($params['conditions'] as $key => $value) {
+                    $this->db->where($key, $value);
+                }
+            }
+
+            if (array_key_exists("id", $params)) {
+                $this->db->where('id', $params['id']);
+                $query = $this->db->get();
+                $result = $query->row_array();
+            } else {
+                //set start and limit
+                if (array_key_exists("start", $params) && array_key_exists("limit", $params)) {
+                    $this->db->limit($params['limit'], $params['start']);
+                } elseif (!array_key_exists("start", $params) && array_key_exists("limit", $params)) {
+                    $this->db->limit($params['limit']);
+                }
+
+                if (array_key_exists("returnType", $params) && $params['returnType'] == 'count') {
+                    $result = $this->db->count_all_results();
+                } elseif (array_key_exists("returnType", $params) && $params['returnType'] == 'single') {
+                    $query = $this->db->get();
+                    $result = ($query->num_rows() > 0) ? $query->row_array() : false;
+                } else {
+                    $query = $this->db->get();
+                    $result = ($query->num_rows() > 0) ? $query->result_array() : false;
+                }
+            }
+        } else {
+            //get all lost item
+            $query = $this->db->get();
+            $result = $query->result_array();
+        }
+        //return fetched data
+        return $result;
+    }
+
 }
 
 /* End of file .php */

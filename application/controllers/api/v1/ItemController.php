@@ -830,4 +830,79 @@ class ItemController extends REST_Controller
         }
 
     }
+
+    public function report_item_post()
+    {
+        $item_id = $this->post('item_id');
+        $reported_by = $this->post('reported_by');
+        $reason = $this->post('reason');
+
+        if (isset($item_id, $reported_by, $reason)) {
+            //Check if the item exists
+            $item_exists = $this->item->get(array(
+                'id' => $item_id
+            ));
+
+            if ($item_exists) {
+                //insert new item report
+                $insert_result = $this->item->add_item_report(array(
+                    'item_id' => $item_id,
+                    'reported_by' => $reported_by,
+                    'reason' => $reason,
+                    'date_reported' => date("Y-m-d H:i:s")
+                ));
+
+                if ($insert_result) {
+                    $this->response(array(
+                        'status' => 1,
+                        'message' => 'Successfully Reported'
+                    ), REST_Controller::HTTP_OK);
+                } else {
+                    $this->response(array(
+                        'status' => 0,
+                        'message' => 'Failed to report. Database Error Occured'
+                    ), REST_Controller::HTTP_OK);
+                }
+
+            } else {
+                $this->response("Item not found", REST_Controller::HTTP_BAD_REQUEST);
+            }
+
+        } else {
+            $this->response("Item Id, Reported by and Reason are required!", REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    public function check_reported_item_get()
+    {
+        $item_id = $this->get('item_id');
+        $account_id = $this->get('account_id');
+
+        if (isset($item_id, $account_id)) {
+            //Check if item was already reported
+            $result = $this->item->get_item_reports(array(
+                'returnType' => 'count',
+                'conditions' => array(
+                    'item_id' => $item_id,
+                    'reported_by' => $account_id
+                )
+            ));
+
+            if ($result) {
+                $this->response(array(
+                    'status' => 1,
+                    'message' => 'Already Reported'
+                ), REST_Controller::HTTP_OK);
+            } else {
+                $this->response(array(
+                    'status' => 0,
+                    'message' => 'No report found'
+                ), REST_Controller::HTTP_OK);
+            }
+
+        } else {
+            $this->response("Item Id and Account are required!", REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+    }
 }
