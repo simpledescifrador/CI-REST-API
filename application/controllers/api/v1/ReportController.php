@@ -432,6 +432,8 @@ class ReportController extends REST_Controller
 
         $type = $this->post('type');
 
+        $location_brgy = $this->post('location_brgy');
+
         switch ($type) {
             case "Lost":
                 /*IF LOST ITEM*/
@@ -471,6 +473,7 @@ class ReportController extends REST_Controller
                         $item = array(
                             'item_id' => $insert_result,
                             'type' => $type,
+                            'location_brgy_covered' => $location_brgy,
                             'status' => 'New',
                             'report_type' => 'Personal Thing',
                             'reported_by' => $reported_by,
@@ -536,6 +539,7 @@ class ReportController extends REST_Controller
                         $item = array(
                             'item_id' => $insert_result,
                             'type' => $type,
+                            'location_brgy_covered' => $location_brgy,
                             'status' => 'New',
                             'report_type' => 'Personal Thing',
                             'reported_by' => $reported_by,
@@ -620,6 +624,9 @@ class ReportController extends REST_Controller
         $location_info['longitude'] = $this->post('location_longitude');
 
         $type = $this->post('type');
+
+        $location_brgy = $this->post('location_brgy');
+
         $pet_data['pet_name'] = $this->post('pet_name');
         $pet_data['type'] = $this->post('pet_type');
         $pet_data['pet_condition'] = $this->post('pet_condition');
@@ -667,6 +674,7 @@ class ReportController extends REST_Controller
                 $item = array(
                     'item_id' => $result,
                     'type' => $type,
+                    'location_brgy_covered' => $location_brgy,
                     'status' => 'New',
                     'report_type' => 'Pet',
                     'reported_by' => $reported_by,
@@ -689,7 +697,7 @@ class ReportController extends REST_Controller
                     $this->item_location->insert($location_info);
                 }
 
-                if ($report_type = "Found") {
+                if ($type == "Found") {
                     $match_results = $this->match_making_process($item_id, $pet_data['account_id']);
                     $this->notification_process($item_id, $match_results); // Save and Send notification
                 }
@@ -716,6 +724,8 @@ class ReportController extends REST_Controller
         $location_info['longitude'] = $this->post('location_longitude');
 
         $type = $this->post('type');
+
+        $location_brgy = $this->post('location_brgy');
 
         $person_data['name'] = $this->post('name');
         $person_data['age_group'] = $this->post('age_group');
@@ -756,6 +766,7 @@ class ReportController extends REST_Controller
                 $item = array(
                     'item_id' => $result,
                     'type' => $type,
+                    'location_brgy_covered' => $location_brgy,
                     'status' => 'New',
                     'report_type' => 'Person',
                     'reported_by' => $reported_by,
@@ -778,7 +789,7 @@ class ReportController extends REST_Controller
                     $this->item_location->insert($location_info);
                 }
 
-                if ($report_type = "Found") {
+                if ($type == "Found") {
                     $match_results = $this->match_making_process($item_id, $person_data['account_id']);
                     $this->notification_process($item_id, $match_results); // Save and Send notification
                 }
