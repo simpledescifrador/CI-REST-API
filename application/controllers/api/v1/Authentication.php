@@ -149,7 +149,7 @@ class Authentication extends REST_Controller
         if (isset($makatizen_number, $new_password)) {
             //Change Password
             $data = array(
-                'password' => $new_password
+                'password' => md5($new_password)
             );
 
             //Get the account ID using makatizen_number
@@ -383,7 +383,7 @@ class Authentication extends REST_Controller
             $random_code = strtoupper(random_string('alnum', 6));
             $this->load->model('authentication_model');
 
-            $insert_success = $this->authentication_model->insert_email_verification($email, $random_code, $token);
+            $insert_success = $this->authentication_model->insert_email_verification($email, $random_code, "");
 
             if ($insert_success) {
                 //Send the code to email
